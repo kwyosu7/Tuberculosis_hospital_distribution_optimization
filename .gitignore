@@ -11,3 +11,9 @@ data_result/
 
 # Local assistant notes
 CLAUDE.md
+
+# Local data link / generated outputs
+data
+results/
+figures/
+*.egg-info/
