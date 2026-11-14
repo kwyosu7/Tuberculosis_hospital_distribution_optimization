@@ -75,6 +75,11 @@ Python 3 with `numpy`, `pandas`, `matplotlib` (and Jupyter for the notebooks).
 Please cite the manuscript and the Dryad dataset
 (doi:10.5061/dryad.b2rbnzss4). A code DOI (Zenodo) will be added upon release.
 
+## License
+
+Code is released under the MIT License (see `LICENSE`). The dataset on Dryad
+has its own license.
+
 ## Contact
 
 Please open a GitHub Issue for questions.
