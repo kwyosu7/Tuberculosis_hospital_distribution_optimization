@@ -1,135 +1,80 @@
-# Tuberculosis Hospital Optimization (South Korea, 2014–2022)
+# Age structure and optimal TB hospital allocation in South Korea (2014–2022)
 
-This repository provides the code used for the age-sensitive
-tuberculosis (TB) hospital distribution and optimization analysis in
-South Korea.  
-The purpose of this repository is to ensure computational
-reproducibility of the study and to support reuse of the accompanying
-high-resolution dataset.
+Code for the manuscript
 
-------------------------------------------------------------------------
+> Y. Kwon, D.-S. Lee, S.-W. Son, M. J. Lee,
+> *Age structure alters optimal hospital allocation for reducing tuberculosis
+> fatalities in South Korea* (arXiv:2602.16437).
 
-## Repository Structure
+The repository reproduces the data preprocessing, the hospital-allocation
+optimization (with and without age weighting), and the manuscript figures.
 
-The recommended structure of this repository is as follows:
-
--   README.md  
--   notebooks/ (Jupyter notebooks for preprocessing, optimization, and
-    visualization)  
--   src/ (optional reusable Python modules, if applicable)  
--   data/ (downloaded dataset files; not tracked by git)  
--   results/ or data_result/ (generated outputs; not tracked by git)
-
-If your workflow generates outputs into `data_result/`, that is
-acceptable. These directories should remain excluded from version
-control.
+> **Status:** the `revision-scirep` branch contains work in progress for the
+> Scientific Reports revision. Paths and some scripts will change on this branch
+> until it is merged into `main` and archived with a DOI.
 
 ------------------------------------------------------------------------
 
-## Data Availability
+## Repository structure
 
-The dataset used in this study is publicly available on Dryad.
+| Path | Description |
+|---|---|
+| `data_preproccess/preproccess_filtering_40over.py` | Filters districts and computes the age-specific parameters (η̃) used by the model. Output: `data_result/data_over40/{year}_40.txt` |
+| `data_preproccess/rate_generate.ipynb` | Builds age-specific patient/fatality ratios from province-level data |
+| `no_age/optimization.py` | Optimization without age weighting |
+| `at_b_tau12345/at_b_optimization.py` | **Age-weighted optimization used in the manuscript** (age groups t = 1..5 for 40–49, …, 80+; weight a·t + b, a ∈ [−2, 1]) |
+| `at_b/` | Earlier version of the age-weighted model (kept for reference) |
+| `article_figure*.ipynb` | Manuscript figures |
+| `check_basic_properties.ipynb`, `check_z.py`, `*/result_check.ipynb` | Auxiliary checks |
+| `*.sh` | Batch scripts used to run the optimizations on a cluster |
 
-**Public DOI (post-publication):**  
-
-
-**Reviewer (private share link; pre-publication):**  
-
-
-The Dryad dataset includes its own README file describing variables,
-filtering procedures, and file formats in detail.
-
-------------------------------------------------------------------------
-
-## Data Download & Placement
-
-1.  Download the dataset from Dryad using the DOI or reviewer link.  
-2.  Extract the downloaded archive.  
-3.  Place all extracted files into the `data` directory located at the
-    root of this repository.
-
-After extraction, the directory should contain files similar to:
-
-**Province-level (Si/Do) summaries:** -
-sido_fatalities_age_2014_2022.csv  
-- sido_patients_age_2014_2022.csv  
-- sido_hospital_2014_2022.csv
-
-**District-level (Si/Gun/Gu) annual files:** - sigungu_nd_age_2014.csv
-through sigungu_nd_age_2022.csv  
-- sigungu_nd_age_filtered_2014.csv through
-sigungu_nd_age_filtered_2022.csv
-
-If you prefer to store the dataset in a different location, modify the
-path variables inside the notebooks accordingly. It is recommended to
-define a single `DATA_DIR` variable near the top of each notebook.
-
+Generated files (`data_result/`) are not tracked; regenerate them with the
+scripts above.
 
 ------------------------------------------------------------------------
 
-## How to Run
+## Data
 
-1.  Create and activate your Python environment.  
+The input dataset is publicly available on Dryad:
+https://doi.org/10.5061/dryad.b2rbnzss4
 
-2.  Ensure the Dryad dataset is correctly placed in the `data`
-    directory.  
+It contains
 
-3.  Execute the notebooks in the following logical order:
+- province-level (si/do) files: `sido_patients_age_2014_2022.csv`,
+  `sido_fatalities_age_2014_2022.csv`, `sido_hospital_2014_2022.csv`
+- district-level (si/gun/gu) files: `sigungu_nd_age_{2014..2022}.csv` and the
+  filtered versions `sigungu_nd_age_filtered_{2014..2022}.csv`
 
-    1)  Data preprocessing  
-    2)  Optimization analysis  
-    3)  Visualization and figure generation
-
-Notebook filenames may differ. Please execute them according to the
-analysis flow described above.
+See the Dryad README for variable definitions and filtering procedures.
 
 ------------------------------------------------------------------------
 
-## Outputs
+## Requirements
 
-Generated outputs such as intermediate tables, optimization results, and
-figures are typically written to:
-
--   `results/`  
--   `data_result/`
-
-These directories are intended for local outputs and should not be
-tracked by git.
+Python 3 with `numpy`, `pandas`, `matplotlib` (and Jupyter for the notebooks).
 
 ------------------------------------------------------------------------
 
-## Notes on Reproducibility
+## How to run
 
--   This repository is designed to reproduce the analysis results given
-    the Dryad dataset.  
--   Exact numerical reproduction may depend on the Python version and
-    package versions used.  
--   If path-related errors occur, verify that:
-    -   the dataset files are located in the `data` directory  
-    -   path variables inside notebooks are correctly defined
+1. Download the Dryad dataset and set the data path in the scripts.
+2. Preprocess: `python data_preproccess/preproccess_filtering_40over.py`
+3. Optimize:
+   - without age weighting: `no_age/optimization.py`
+   - age-weighted: `at_b_tau12345/at_b_optimization.py`
+   (Monte Carlo, 10^5 steps per year; see the `.sh` files for the arguments used.)
+4. Run the `article_figure*.ipynb` notebooks to produce the figures.
+
+> Note: some scripts still contain absolute paths from the original computing
+> environment. These are being replaced with configurable paths in the revision.
 
 ------------------------------------------------------------------------
 
 ## Citation
 
-If you use this dataset or code, please cite the Dryad dataset and the
-associated manuscript.
-
-**Dryad dataset DOI:**  
-https://datadryad.org/dataset/doi:10.5061/dryad.b2rbnzss4
-
-The manuscript citation can be added here after publication.
-
-------------------------------------------------------------------------
-
-## License
-
-A license file (e.g., MIT License) should be added to clarify reuse
-permissions.  
-If no license is provided, standard copyright restrictions apply.
-
-------------------------------------------------------------------------
+Please cite the manuscript and the Dryad dataset
+(doi:10.5061/dryad.b2rbnzss4). A code DOI (Zenodo) will be added upon release.
 
 ## Contact
 
-For questions or issues, please open a GitHub Issue in this repository.
+Please open a GitHub Issue for questions.
