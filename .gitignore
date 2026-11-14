@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Generated results (regenerate from code)
+data_result/
+
+# Local assistant notes
+CLAUDE.md
