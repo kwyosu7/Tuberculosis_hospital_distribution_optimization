@@ -26,6 +26,9 @@ _DRYAD_COLUMNS = {
 
 PHI_MIN = 1e-10
 
+# spelling variants in the Dryad files -> canonical province name
+_SIDO_FIX = {"Gwangwon": "Gangwon"}
+
 
 # ---------------------------------------------------------------------------
 # raw data
@@ -45,6 +48,7 @@ def _load_sido_table(name: str, data_dir: Path | None) -> pd.DataFrame:
     data_dir = Path(data_dir or config.DATA_DIR)
     df = pd.read_csv(data_dir / name, encoding="utf-8-sig").rename(columns={"do/si": "sido"})
     df.columns = [int(c) if str(c).isdigit() else c for c in df.columns]
+    df["sido"] = df["sido"].replace(_SIDO_FIX)
     return df
 
 
@@ -61,6 +65,40 @@ def load_sido_fatalities(data_dir: Path | None = None) -> pd.DataFrame:
 def load_sido_hospitals(data_dir: Path | None = None) -> pd.DataFrame:
     """Number of TB hospitals per province (rows) and year (columns)."""
     return _load_sido_table("sido_hospital_2014_2022.csv", data_dir)
+
+
+def load_sido_population_2022() -> pd.DataFrame:
+    """General population of each province by 10-year age group (2022)."""
+    df = pd.read_csv(config.AUX_DIR / "sido_population_age_2022.csv", encoding="utf-8-sig")
+    df = df.rename(columns={"sigungu": "sido"}).set_index("sido")
+    return df.apply(lambda c: pd.to_numeric(c.astype(str).str.replace(r"[ ,]", "", regex=True)))
+
+
+def _to_10yr(age: str) -> str:
+    lo = int(age.split("_")[0])
+    return "80_" if lo >= 80 else f"{lo // 10 * 10}_{lo // 10 * 10 + 9}"
+
+
+def sido_age_fractions_from_counts(year: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Province age fractions n_t, d_t computed from the province count tables.
+
+    This is how the district files' n/d columns were built (10-year groups,
+    normalized within each province). Provinces without deaths give NaN.
+    """
+    out = []
+    for tab in (load_sido_patients(), load_sido_fatalities()):
+        t = tab.assign(age10=tab["age"].map(_to_10yr)).groupby(["sido", "age10"], sort=False)[year].sum()
+        t = t.unstack()[list(config.AGE_GROUPS)]
+        out.append(t.div(t.sum(axis=1), axis=0))
+    return out[0], out[1]
+
+
+def sido_age_fractions(year: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Province age fractions (n_t, d_t) for all 9 age groups, as used in the reconstruction."""
+    df = load_district(year).drop_duplicates("sido").set_index("sido")
+    n = df[[f"n{a}" for a in config.AGE_GROUPS]].set_axis(config.AGE_GROUPS, axis=1)
+    d = df[[f"d{a}" for a in config.AGE_GROUPS]].set_axis(config.AGE_GROUPS, axis=1)
+    return n, d
 
 
 # ---------------------------------------------------------------------------

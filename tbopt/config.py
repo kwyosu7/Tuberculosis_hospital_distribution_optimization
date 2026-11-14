@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = Path(os.environ.get("TB_DATA_DIR", ROOT / "data"))
 RESULT_DIR = Path(os.environ.get("TB_RESULT_DIR", ROOT / "results"))
 FIG_DIR = Path(os.environ.get("TB_FIG_DIR", ROOT / "figures"))
+AUX_DIR = ROOT / "data_aux"  # small public auxiliary tables shipped with the code
+MAP_DIR = Path(os.environ.get("TB_MAP_DIR", ROOT / "data_aux" / "korea_map"))
 
 YEARS = tuple(range(2014, 2023))
 
