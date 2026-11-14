@@ -185,3 +185,22 @@ def summary_table(years=config.YEARS) -> pd.DataFrame:
             "H": int(df["h"].sum()),
         })
     return pd.DataFrame(rows).set_index("year")
+
+
+def sido_summary_table(years=config.YEARS) -> pd.DataFrame:
+    """Manuscript Table 1: national totals of N, D (all ages) and H per year (Dryad province tables)."""
+    years = list(years)
+    return pd.DataFrame({
+        "N": load_sido_patients()[years].sum(),
+        "D": load_sido_fatalities()[years].sum(),
+        "H": load_sido_hospitals()[years].sum(),
+    }).rename_axis("year")
+
+
+def table_to_latex(df: pd.DataFrame, float_fmt: str = "{:,.1f}") -> str:
+    """Rows as LaTeX ``year & ... \\\\`` lines with thin-space thousands separators."""
+    def fmt(v):
+        if isinstance(v, (float, np.floating)) and not float(v).is_integer():
+            return float_fmt.format(v).replace(",", " ")
+        return f"{int(v):,}".replace(",", " ")
+    return "\n".join(f"{y} & " + " & ".join(fmt(v) for v in row) + r" \\" for y, row in df.iterrows())

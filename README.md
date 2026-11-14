@@ -24,7 +24,7 @@ tbopt/                 Python package (all computations)
   plotting.py          figure style and helpers
 scripts/run_pipeline.py  preprocessing + all optimizations (parallel)
 notebooks/
-  01_data_and_table2.ipynb   filtering, Table 2, data consistency checks
+  01_data_and_tables.ipynb   Tables 1–2 (+ LaTeX rows), filter steps, data checks
   02_figures.ipynb           manuscript figures
 tests/                 consistency tests (incl. agreement with the original implementation)
 data_aux/              small public auxiliary tables (population by age, province codes)
