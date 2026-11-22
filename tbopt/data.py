@@ -188,12 +188,16 @@ def summary_table(years=config.YEARS) -> pd.DataFrame:
 
 
 def sido_summary_table(years=config.YEARS) -> pd.DataFrame:
-    """Manuscript Table 1: national totals of N, D (all ages) and H per year (Dryad province tables)."""
+    """Manuscript Table 1: national totals per year.
+
+    N, D: Dryad province tables. H: sum over the Dryad district files (hospitals are
+    recorded at district level; the province hospital table disagrees by +-1).
+    """
     years = list(years)
     return pd.DataFrame({
         "N": load_sido_patients()[years].sum(),
         "D": load_sido_fatalities()[years].sum(),
-        "H": load_sido_hospitals()[years].sum(),
+        "H": pd.Series({y: int(load_district(y)["h"].sum()) for y in years}),
     }).rename_axis("year")
 
 
