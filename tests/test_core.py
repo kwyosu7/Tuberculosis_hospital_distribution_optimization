@@ -96,3 +96,14 @@ def test_monte_carlo_matches_legacy(df, a):
     assert res.E_final == pytest.approx(E_leg, rel=1e-10)
     assert res.E_final < res.E_trace[0]
     assert res.h.sum() == pytest.approx(df["h"].sum())
+
+
+def test_district_population_matches_district_rows_and_province_totals():
+    for y in config.YEARS:
+        p, d = data.load_district_population(y), data.load_district(y)
+        assert list(zip(p.sido, p.sigungu)) == list(zip(d.sido, d.sigungu))
+        g = p[[f"g{a}" for a in config.AGE_GROUPS]].sum(axis=1)
+        np.testing.assert_allclose(g, 1.0, atol=1e-12)
+    p = data.load_district_population(2022)
+    sido = data.load_sido_population_2022().drop(index="Sejong").sum(axis=1)
+    assert (p.groupby("sido")["P"].sum().reindex(sido.index) == sido).all()

@@ -208,3 +208,12 @@ def table_to_latex(df: pd.DataFrame, float_fmt: str = "{:,.1f}") -> str:
             return float_fmt.format(v).replace(",", " ")
         return f"{int(v):,}".replace(",", " ")
     return "\n".join(f"{y} & " + " & ".join(fmt(v) for v in row) + r" \\" for y, row in df.iterrows())
+
+
+def load_district_population(year: int) -> pd.DataFrame:
+    """District population in the Dryad layout: sido, sigungu, P (total), g{age} fractions.
+
+    Same rows and names as ``load_district(year)``; Sejong (no districts) is absent as in Dryad.
+    """
+    df = pd.read_csv(config.AUX_DIR / "sigungu_population" / f"sigungu_population_age_{year}.csv")
+    return df.rename(columns={"do/si": "sido", "si/gun/gu": "sigungu", "Population": "P"})
