@@ -107,3 +107,13 @@ def test_district_population_matches_district_rows_and_province_totals():
     p = data.load_district_population(2022)
     sido = data.load_sido_population_2022().drop(index="Sejong").sum(axis=1)
     assert (p.groupby("sido")["P"].sum().reindex(sido.index) == sido).all()
+
+
+def test_district_deaths_layout():
+    for y in config.YEARS:
+        q, d = data.load_district_deaths(y), data.load_district(y)
+        assert list(zip(q.sido, q.sigungu)) == list(zip(d.sido, d.sigungu))
+        np.testing.assert_allclose(q[[f"q{a}" for a in config.AGE_GROUPS]].sum(axis=1), 1.0, atol=1e-12)
+        f = data.load_district_deaths(y, filtered=True)
+        assert list(zip(f.sido, f.sigungu)) == list(zip(*data.preprocess(y)[["sido", "sigungu"]].values.T))
+        assert (f[[f"q{a}" for a in config.AGE_GROUPS_40]].to_numpy() > 0).all()  # every 40+ group has deaths

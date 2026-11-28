@@ -217,3 +217,10 @@ def load_district_population(year: int) -> pd.DataFrame:
     """
     df = pd.read_csv(config.AUX_DIR / "sigungu_population" / f"sigungu_population_age_{year}.csv")
     return df.rename(columns={"do/si": "sido", "si/gun/gu": "sigungu", "Population": "P"})
+
+
+def load_district_deaths(year: int, filtered: bool = False) -> pd.DataFrame:
+    """District all-cause deaths in the Dryad layout: sido, sigungu, Deaths, q{age} fractions (KOSIS)."""
+    name = f"sigungu_deaths_age_filtered_{year}.csv" if filtered else f"sigungu_deaths_age_{year}.csv"
+    df = pd.read_csv(config.AUX_DIR / "sigungu_deaths" / name)
+    return df.rename(columns={"do/si": "sido", "si/gun/gu": "sigungu"})
